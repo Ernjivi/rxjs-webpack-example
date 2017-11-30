@@ -90,6 +90,11 @@ module.exports = {
                 return context && context.indexOf('node_modules') >= 0;
             },
         }),
+        new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery',
+            Popper: ['popper.js', 'default']
+        }),
         extractTextPlugin
     ]
 }
