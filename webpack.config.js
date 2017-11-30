@@ -1,0 +1,69 @@
+const path = require('path');
+const package = require('./package.json');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const webpack = require('webpack');
+
+
+
+module.exports = {
+    entry: {
+        app: './src/app.js',
+        // vendor: Object.keys(package.dependencies)
+    },
+    output: {
+        filename: '[name]-bundle.js',
+        path: path.resolve(__dirname, 'dist')
+    },
+    devServer: {
+        contentBase: path.join(__dirname, "dist"),
+        port: 8080
+    },
+    module: {
+        rules: [
+            { 
+                test: /\.js$/, 
+                use: 'babel-loader', 
+                exclude: /node_modules/ },
+            {
+                test: /\.html$/,
+                use: {
+                    loader: 'html-loader',
+                }
+            },
+            {
+                test: /\.(png|jpg|gif)$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name]-[hash:7].[ext]',
+                            outputPath: 'images/'
+                        },
+                    },
+                    {
+                        loader: 'image-webpack-loader',
+                        options: {
+                            bypassOnDebug: true,
+                        },
+                    }
+                ]
+            }
+        ]
+    },
+    plugins: [
+        new CleanWebpackPlugin(['dist']),
+        new HtmlWebpackPlugin({
+            title: 'Development',
+            template: './src/index.html'
+        }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'vendor-bundle',
+            filename: 'vendor-bundle.js',
+            minChunks(module, count) {
+                var context = module.context;
+                return context && context.indexOf('node_modules') >= 0;
+            },
+        }),
+    ]
+}
