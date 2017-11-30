@@ -15,7 +15,6 @@ const extractTextPlugin = new ExtractTextPlugin({
 module.exports = {
     entry: {
         app: './src/app.js',
-        // vendor: Object.keys(package.dependencies)
     },
     output: {
         filename: '[name]-[hash:7]-bundle.js',
@@ -40,7 +39,21 @@ module.exports = {
             {
                 test: /\.scss$/,
                 use: extractTextPlugin.extract({
-                    use: ['css-loader', 'sass-loader']
+                    use: [
+                        'css-loader',
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                                plugins: function () {
+                                    return [
+                                        require('precss'),
+                                        require('autoprefixer')
+                                    ];
+                                }
+                            }
+                        },
+                        'sass-loader',
+                    ]
                 })
             },
             {
