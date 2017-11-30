@@ -3,6 +3,12 @@ const package = require('./package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const webpack = require('webpack');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+
+
+const extractTextPlugin = new ExtractTextPlugin({
+    filename: 'styles/main-[hash:7].css',
+})
 
 
 
@@ -12,7 +18,7 @@ module.exports = {
         // vendor: Object.keys(package.dependencies)
     },
     output: {
-        filename: '[name]-bundle.js',
+        filename: '[name]-[hash:7]-bundle.js',
         path: path.resolve(__dirname, 'dist')
     },
     devServer: {
@@ -30,6 +36,12 @@ module.exports = {
                 use: {
                     loader: 'html-loader',
                 }
+            },
+            {
+                test: /\.scss$/,
+                use: extractTextPlugin.extract({
+                    use: ['css-loader', 'sass-loader']
+                })
             },
             {
                 test: /\.(png|jpg|gif)$/,
@@ -59,11 +71,12 @@ module.exports = {
         }),
         new webpack.optimize.CommonsChunkPlugin({
             name: 'vendor-bundle',
-            filename: 'vendor-bundle.js',
+            filename: 'vendor-[hash:7]-bundle.js',
             minChunks(module, count) {
                 var context = module.context;
                 return context && context.indexOf('node_modules') >= 0;
             },
         }),
+        extractTextPlugin
     ]
 }
